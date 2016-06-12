@@ -14,7 +14,6 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
-with Ada.Text_IO;
 with Interfaces.C.Strings;
 with XCB;
 
@@ -26,6 +25,8 @@ procedure Vision.Main is
      := XCB.Setup_Roots_Iterator (XCB.Get_Setup (Connection)).Data;
    Window : constant XCB.Window_Id_Type
      := XCB.Generate_Id (Connection);
+   Context : constant XCB.Gcontext_Id_Type
+     := XCB.Generate_Id (Connection);
 
    Unused_Cookie : XCB.Void_Cookie_Type;
    pragma Unreferenced (Unused_Cookie);
@@ -33,7 +34,77 @@ procedure Vision.Main is
    Unused_Int : Interfaces.C.int;
    pragma Unreferenced (Unused_Int);
 
+
+   function Scaled_Rectangle
+     (Origin : XCB.Point_Type;
+      X, Y : Interfaces.Integer_16;
+      W, H : Interfaces.Unsigned_16;
+      Scale : Interfaces.Unsigned_16)
+     return XCB.Rectangle_Type;
+
+   procedure Snellen_E
+     (Top_Left : in XCB.Point_Type;
+      Gap_Size : in Interfaces.Unsigned_16);
+
+
+   function Scaled_Rectangle
+     (Origin : XCB.Point_Type;
+      X, Y : Interfaces.Integer_16;
+      W, H : Interfaces.Unsigned_16;
+      Scale : Interfaces.Unsigned_16)
+     return XCB.Rectangle_Type
+   is
+      use type Interfaces.Integer_16;
+      use type Interfaces.Unsigned_16;
+      S_Scale : constant Interfaces.Integer_16
+        := Interfaces.Integer_16 (Scale);
+   begin
+      return (X => Origin.X + S_Scale * X,
+              Y => Origin.Y + S_Scale * Y,
+              Width => Scale * W,
+              Height => Scale * H);
+   end Scaled_Rectangle;
+
+
+   procedure Snellen_E
+     (Top_Left : in XCB.Point_Type;
+      Gap_Size : in Interfaces.Unsigned_16)
+   is
+      Rectangles : constant XCB.Rectangle_Array_Type
+        := (0 => Scaled_Rectangle (Top_Left, 0, 0, 1, 5, Gap_Size),
+            1 => Scaled_Rectangle (Top_Left, 1, 0, 4, 1, Gap_Size),
+            2 => Scaled_Rectangle (Top_Left, 1, 4, 4, 1, Gap_Size),
+            3 => Scaled_Rectangle (Top_Left, 1, 2, 3, 1, Gap_Size));
+   begin
+      Unused_Cookie := XCB.Poly_Fill_Rectangle
+        (C => Connection,
+         Drawable => Window,
+         Gc => Context,
+         Rectangles_Length => Rectangles'Length,
+         Rectangles => Rectangles);
+   end Snellen_E;
+
 begin
+   Create_Graphic_Context :
+   declare
+      use type XCB.Gc_Type;
+      Mask : constant XCB.Gc_Type
+        := XCB.XCB_GC_FOREGROUND
+        or XCB.XCB_GC_BACKGROUND
+        or XCB.XCB_GC_GRAPHICS_EXPOSURES;
+      List : aliased constant XCB.Value_List_Array
+        := (0 => Screen.Black_Pixel,
+            1 => Screen.White_Pixel,
+            2 => 0);
+   begin
+      Unused_Cookie := XCB.Create_Gc
+        (C => Connection,
+         Cid => Context,
+         Drawable => Screen.Root,
+         Value_Mask => Interfaces.Unsigned_32 (Mask),
+         Value_List => List);
+   end Create_Graphic_Context;
+
    Create_Window :
    declare
       use type XCB.Cw_Type;
@@ -78,6 +149,10 @@ begin
          case Event.Response_Kind is
             when XCB.XCB_KEY_PRESS =>
                Exiting := True;
+
+            when XCB.XCB_EXPOSE =>
+               Snellen_E ((15, 15), 24);
+               Unused_Int := XCB.Flush (Connection);
 
             when others =>
                null;
