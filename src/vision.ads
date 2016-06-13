@@ -16,4 +16,8 @@
 
 package Vision is
 
+   package Directions is
+      type Enum is (North, South, East, West);
+   end Directions;
+
 end Vision;

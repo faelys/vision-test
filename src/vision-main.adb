@@ -14,6 +14,7 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
+with Ada.Command_Line;
 with Interfaces.C.Strings;
 with XCB;
 
@@ -42,9 +43,16 @@ procedure Vision.Main is
       Scale : Interfaces.Unsigned_16)
      return XCB.Rectangle_Type;
 
+   function Snellen_E
+     (Top_Left : in XCB.Point_Type;
+      Gap_Size : in Interfaces.Unsigned_16;
+      Direction : in Directions.Enum)
+     return XCB.Rectangle_Array_Type;
+
    procedure Snellen_E
      (Top_Left : in XCB.Point_Type;
-      Gap_Size : in Interfaces.Unsigned_16);
+      Gap_Size : in Interfaces.Unsigned_16;
+      Direction : in Directions.Enum);
 
 
    function Scaled_Rectangle
@@ -66,15 +74,51 @@ procedure Vision.Main is
    end Scaled_Rectangle;
 
 
+   function Snellen_E
+     (Top_Left : in XCB.Point_Type;
+      Gap_Size : in Interfaces.Unsigned_16;
+      Direction : in Directions.Enum)
+     return XCB.Rectangle_Array_Type is
+   begin
+      case Direction is
+         when Directions.North =>
+            return
+              (0 => Scaled_Rectangle (Top_Left, 0, 0, 5, 1, Gap_Size),
+               1 => Scaled_Rectangle (Top_Left, 0, 1, 1, 4, Gap_Size),
+               2 => Scaled_Rectangle (Top_Left, 4, 1, 1, 4, Gap_Size),
+               3 => Scaled_Rectangle (Top_Left, 2, 1, 1, 3, Gap_Size));
+
+         when Directions.South =>
+            return
+              (0 => Scaled_Rectangle (Top_Left, 0, 4, 5, 1, Gap_Size),
+               1 => Scaled_Rectangle (Top_Left, 0, 0, 1, 4, Gap_Size),
+               2 => Scaled_Rectangle (Top_Left, 4, 0, 1, 4, Gap_Size),
+               3 => Scaled_Rectangle (Top_Left, 2, 1, 1, 3, Gap_Size));
+
+         when Directions.West =>
+            return
+              (0 => Scaled_Rectangle (Top_Left, 0, 0, 1, 5, Gap_Size),
+               1 => Scaled_Rectangle (Top_Left, 1, 0, 4, 1, Gap_Size),
+               2 => Scaled_Rectangle (Top_Left, 1, 4, 4, 1, Gap_Size),
+               3 => Scaled_Rectangle (Top_Left, 1, 2, 3, 1, Gap_Size));
+
+         when Directions.East =>
+            return
+              (0 => Scaled_Rectangle (Top_Left, 4, 0, 1, 5, Gap_Size),
+               1 => Scaled_Rectangle (Top_Left, 0, 0, 4, 1, Gap_Size),
+               2 => Scaled_Rectangle (Top_Left, 0, 4, 4, 1, Gap_Size),
+               3 => Scaled_Rectangle (Top_Left, 1, 2, 3, 1, Gap_Size));
+      end case;
+   end Snellen_E;
+
+
    procedure Snellen_E
      (Top_Left : in XCB.Point_Type;
-      Gap_Size : in Interfaces.Unsigned_16)
+      Gap_Size : in Interfaces.Unsigned_16;
+      Direction : in Directions.Enum)
    is
       Rectangles : constant XCB.Rectangle_Array_Type
-        := (0 => Scaled_Rectangle (Top_Left, 0, 0, 1, 5, Gap_Size),
-            1 => Scaled_Rectangle (Top_Left, 1, 0, 4, 1, Gap_Size),
-            2 => Scaled_Rectangle (Top_Left, 1, 4, 4, 1, Gap_Size),
-            3 => Scaled_Rectangle (Top_Left, 1, 2, 3, 1, Gap_Size));
+        := Snellen_E (Top_Left, Gap_Size, Direction);
    begin
       Unused_Cookie := XCB.Poly_Fill_Rectangle
         (C => Connection,
@@ -84,7 +128,16 @@ procedure Vision.Main is
          Rectangles => Rectangles);
    end Snellen_E;
 
+   Direction : Directions.Enum := Directions.West;
 begin
+
+   Read_Direction :
+   begin
+      Direction := Directions.Enum'Value (Ada.Command_Line.Argument (1));
+   exception
+      when others => null;
+   end Read_Direction;
+
    Create_Graphic_Context :
    declare
       use type XCB.Gc_Type;
@@ -151,7 +204,7 @@ begin
                Exiting := True;
 
             when XCB.XCB_EXPOSE =>
-               Snellen_E ((15, 15), 24);
+               Snellen_E ((15, 15), 24, Direction);
                Unused_Int := XCB.Flush (Connection);
 
             when others =>
