@@ -29,6 +29,9 @@ procedure Vision.Main is
    Context : constant XCB.Gcontext_Id_Type
      := XCB.Generate_Id (Connection);
 
+   Whole_Window : XCB.Rectangle_Array_Type (0 .. 0)
+     := (0 => (X => 0, Y => 0, Width => 150, Height => 150));
+
    Unused_Cookie : XCB.Void_Cookie_Type;
    pragma Unreferenced (Unused_Cookie);
 
@@ -120,6 +123,25 @@ procedure Vision.Main is
       Rectangles : constant XCB.Rectangle_Array_Type
         := Snellen_E (Top_Left, Gap_Size, Direction);
    begin
+      Unused_Cookie := XCB.Change_Gc
+        (C => Connection,
+         Gc => Context,
+         Value_Mask => Interfaces.Unsigned_32 (XCB.XCB_GC_FOREGROUND),
+         Value_List => (0 => Screen.White_Pixel));
+
+      Unused_Cookie := XCB.Poly_Fill_Rectangle
+        (C => Connection,
+         Drawable => Window,
+         Gc => Context,
+         Rectangles_Length => Whole_Window'Length,
+         Rectangles => Whole_Window);
+
+      Unused_Cookie := XCB.Change_Gc
+        (C => Connection,
+         Gc => Context,
+         Value_Mask => Interfaces.Unsigned_32 (XCB.XCB_GC_FOREGROUND),
+         Value_List => (0 => Screen.Black_Pixel));
+
       Unused_Cookie := XCB.Poly_Fill_Rectangle
         (C => Connection,
          Drawable => Window,
@@ -175,10 +197,10 @@ begin
          Depth => 0,
          Wid => Window,
          Parent => Screen.Root,
-         X => 0,
-         Y => 0,
-         Width => 150,
-         Height => 150,
+         X => Whole_Window (0).X,
+         Y => Whole_Window (0).Y,
+         Width => Whole_Window (0).Width,
+         Height => Whole_Window (0).Height,
          Border_Width => 1,
          Class => XCB.XCB_WINDOW_CLASS_INPUT_OUTPUT,
          Visual => Screen.Root_Visual,
