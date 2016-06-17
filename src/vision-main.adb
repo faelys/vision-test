@@ -15,6 +15,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Command_Line;
+with Ada.Unchecked_Conversion;
 with Interfaces.C.Strings;
 with XCB;
 
@@ -37,6 +38,13 @@ procedure Vision.Main is
 
    Unused_Int : Interfaces.C.int;
    pragma Unreferenced (Unused_Int);
+
+   pragma Warnings (Off);
+   function To_Configure_Notify_Event
+     is new Ada.Unchecked_Conversion
+        (Source => XCB.Generic_Event_Access_Type,
+         Target => XCB.Configure_Notify_Event_Access_Type);
+   pragma Warnings (On);
 
 
    function Scaled_Rectangle
@@ -185,7 +193,8 @@ begin
       use type XCB.Cw_Type;
       use type XCB.Event_Mask_Type;
       Events : constant XCB.Event_Mask_Type
-        := XCB.XCB_EVENT_MASK_EXPOSURE or XCB.XCB_EVENT_MASK_KEY_PRESS;
+        := XCB.XCB_EVENT_MASK_EXPOSURE or XCB.XCB_EVENT_MASK_KEY_PRESS
+           or XCB.XCB_EVENT_MASK_STRUCTURE_NOTIFY;
       Mask : constant XCB.Cw_Type
         := XCB.XCB_CW_BACK_PIXEL or XCB.XCB_CW_EVENT_MASK;
       List : aliased constant XCB.Value_List_Array
@@ -228,6 +237,15 @@ begin
             when XCB.XCB_EXPOSE =>
                Snellen_E ((15, 15), 24, Direction);
                Unused_Int := XCB.Flush (Connection);
+
+            when XCB.XCB_CONFIGURE_NOTIFY =>
+               declare
+                  Full_Event : constant XCB.Configure_Notify_Event_Access_Type
+                    := To_Configure_Notify_Event (Event);
+               begin
+                  Whole_Window (0).Width := Full_Event.Width;
+                  Whole_Window (0).Height := Full_Event.Height;
+               end;
 
             when others =>
                null;
