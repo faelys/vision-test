@@ -14,25 +14,11 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
-with Ada.Command_Line;
-with Vision.Display;
+package Vision.Display is
 
+   procedure Start;
+   procedure Stop;
 
-procedure Vision.Main is
-   Direction : Directions.Enum := Directions.West;
-begin
+   procedure Update (Direction : in Directions.Enum);
 
-   Display.Start;
-
-   Read_Direction :
-   begin
-      Direction := Directions.Enum'Value (Ada.Command_Line.Argument (1));
-   exception
-      when others => null;
-   end Read_Direction;
-
-   Display.Update (Direction);
-
-   Display.Stop;
-
-end Vision.Main;
+end Vision.Display;
