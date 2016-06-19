@@ -1,4 +1,5 @@
 with "../xcb_library_thin_ada_binding/xcb";
+with "aws";
 
 project Vision is
 

@@ -14,27 +14,9 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
-with Ada.Command_Line;
-with Vision.Display;
-with Vision.Input;
+package Vision.Input is
 
-procedure Vision.Main is
-   Direction : Directions.Enum := Directions.West;
-begin
+   procedure Start;
+   procedure Stop;
 
-   Display.Start;
-   Input.Start;
-
-   Read_Direction :
-   begin
-      Direction := Directions.Enum'Value (Ada.Command_Line.Argument (1));
-   exception
-      when others => null;
-   end Read_Direction;
-
-   Display.Update (Direction);
-
-   Display.Stop;
-   Input.Stop;
-
-end Vision.Main;
+end Vision.Input;

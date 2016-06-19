@@ -14,27 +14,35 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
-with Ada.Command_Line;
-with Vision.Display;
-with Vision.Input;
+with AWS.Config;
+with AWS.Response;
+with AWS.Server;
+with AWS.Status;
 
-procedure Vision.Main is
-   Direction : Directions.Enum := Directions.West;
-begin
+package body Vision.Input is
 
-   Display.Start;
-   Input.Start;
+   WS : AWS.Server.HTTP;
 
-   Read_Direction :
+   function Handler (Request : in AWS.Status.Data) return AWS.Response.Data;
+
+
+
+   function Handler (Request : in AWS.Status.Data) return AWS.Response.Data is
+      pragma Unreferenced (Request);
    begin
-      Direction := Directions.Enum'Value (Ada.Command_Line.Argument (1));
-   exception
-      when others => null;
-   end Read_Direction;
+      return AWS.Response.Build ("text/plain", "Work in progress");
+   end Handler;
 
-   Display.Update (Direction);
 
-   Display.Stop;
-   Input.Stop;
+   procedure Start is
+   begin
+      AWS.Server.Start (WS, Handler'Access, AWS.Config.Get_Current);
+   end Start;
 
-end Vision.Main;
+
+   procedure Stop is
+   begin
+      AWS.Server.Shutdown (WS);
+   end Stop;
+
+end Vision.Input;
