@@ -14,19 +14,11 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
-with Vision.Display;
-with Vision.Engine;
-with Vision.Input;
+package Vision.Engine is
 
-procedure Vision.Main is
-begin
+   procedure Start;
+   procedure Stop;
 
-   Display.Start;
-   Engine.Start;
-   Input.Start;
+   procedure User_Input (Direction : in Directions.Enum);
 
-   Display.Stop;
-   Engine.Stop;
-   Input.Stop;
-
-end Vision.Main;
+end Vision.Engine;

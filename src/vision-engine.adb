@@ -14,19 +14,40 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
+with Ada.Characters.Latin_1;
+with Ada.Text_IO;
+with Ada.Numerics.Discrete_Random;
 with Vision.Display;
-with Vision.Engine;
-with Vision.Input;
 
-procedure Vision.Main is
-begin
+package body Vision.Engine is
 
-   Display.Start;
-   Engine.Start;
-   Input.Start;
+   package Random_Directions is new Ada.Numerics.Discrete_Random
+     (Directions.Enum);
 
-   Display.Stop;
-   Engine.Stop;
-   Input.Stop;
+   Generator : Random_Directions.Generator;
+   Current_Direction : Directions.Enum;
 
-end Vision.Main;
+
+
+   procedure Start is
+   begin
+      Random_Directions.Reset (Generator);
+      Current_Direction := Random_Directions.Random (Generator);
+      Display.Update (Current_Direction);
+   end Start;
+
+
+   procedure Stop is null;
+
+
+   procedure User_Input (Direction : in Directions.Enum) is
+   begin
+      Ada.Text_IO.Put_Line
+        (Directions.Enum'Image (Current_Direction)
+         & Ada.Characters.Latin_1.HT
+         & Directions.Enum'Image (Direction));
+      Current_Direction := Random_Directions.Random (Generator);
+      Display.Update (Current_Direction);
+   end User_Input;
+
+end Vision.Engine;
