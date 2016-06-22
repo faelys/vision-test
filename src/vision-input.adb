@@ -43,11 +43,16 @@ package body Vision.Input is
             P : constant AWS.Parameters.List
               := AWS.Status.Parameters (Request);
             Img : constant String := AWS.Parameters.Get (P, "direction");
+            D : Directions.Enum;
          begin
-            Engine.User_Input (Directions.Enum'Value (Img));
-         exception
-            when Constraint_Error =>
-               return Invalid_Input;
+            begin
+               D := Directions.Enum'Value (Img);
+            exception
+               when Constraint_Error =>
+                  return Invalid_Input;
+            end;
+
+            Engine.User_Input (D);
          end;
          return AWS.Response.URL (Location => "/");
       else
