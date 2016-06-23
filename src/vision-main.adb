@@ -14,12 +14,32 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
+with Ada.Command_Line;
+with Ada.Text_IO;
 with Vision.Display;
 with Vision.Engine;
 with Vision.Input;
 
 procedure Vision.Main is
 begin
+
+   case Ada.Command_Line.Argument_Count is
+      when 1 =>
+         Minimum_Size := 1;
+         Maximum_Size := Detail_Size'Value (Ada.Command_Line.Argument (1));
+
+      when 2 =>
+         Minimum_Size := Detail_Size'Value (Ada.Command_Line.Argument (1));
+         Maximum_Size := Detail_Size'Value (Ada.Command_Line.Argument (2));
+
+      when others =>
+         Ada.Text_IO.Put_Line
+           (Ada.Text_IO.Current_Error,
+            "Usage: " & Ada.Command_Line.Command_Name
+            & " [minimum_size] maximum_size");
+         Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+         return;
+   end case;
 
    Display.Start;
    Engine.Start;

@@ -20,4 +20,9 @@ package Vision is
       type Enum is (North, South, East, West);
    end Directions;
 
+   type Detail_Size is range 1 .. 15_000;
+
+   Minimum_Size : Detail_Size;
+   Maximum_Size : Detail_Size;
+
 end Vision;
