@@ -19,6 +19,6 @@ package Vision.Display is
    procedure Start;
    procedure Stop;
 
-   procedure Update (Direction : in Directions.Enum);
+   procedure Update (Size : in Detail_Size; Direction : in Directions.Enum);
 
 end Vision.Display;

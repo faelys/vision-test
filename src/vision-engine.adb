@@ -33,7 +33,7 @@ package body Vision.Engine is
    begin
       Random_Directions.Reset (Generator);
       Current_Direction := Random_Directions.Random (Generator);
-      Display.Update (Current_Direction);
+      Display.Update (24, Current_Direction);
    end Start;
 
 
@@ -47,7 +47,7 @@ package body Vision.Engine is
          & Ada.Characters.Latin_1.HT
          & Directions.Enum'Image (Direction));
       Current_Direction := Random_Directions.Random (Generator);
-      Display.Update (Current_Direction);
+      Display.Update (24, Current_Direction);
    end User_Input;
 
 end Vision.Engine;

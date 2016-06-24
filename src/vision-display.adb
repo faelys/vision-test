@@ -262,6 +262,8 @@ package body Vision.Display is
          List : aliased constant XCB.Value_List_Array
            := (0 => Screen.White_Pixel,
                1 => Interfaces.Unsigned_32 (Events));
+         Size : constant Interfaces.Unsigned_16
+           := Interfaces.Unsigned_16 (Maximum_Size * 6);
       begin
          Unused_Cookie := XCB.Create_Window
            (C => Connection,
@@ -270,8 +272,8 @@ package body Vision.Display is
             Parent => Screen.Root,
             X => 0,
             Y => 0,
-            Width => 150,
-            Height => 150,
+            Width => Size,
+            Height => Size,
             Border_Width => 1,
             Class => XCB.XCB_WINDOW_CLASS_INPUT_OUTPUT,
             Visual => Screen.Root_Visual,
@@ -334,9 +336,9 @@ package body Vision.Display is
    end Stop;
 
 
-   procedure Update (Direction : in Directions.Enum) is
+   procedure Update (Size : in Detail_Size; Direction : in Directions.Enum) is
    begin
-      Drawer.Update (24, Direction);
+      Drawer.Update (Interfaces.Unsigned_16 (Size), Direction);
       Drawer.Redraw;
    end Update;
 
