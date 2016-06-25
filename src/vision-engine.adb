@@ -17,6 +17,7 @@
 with Ada.Characters.Latin_1;
 with Ada.Text_IO;
 with Ada.Numerics.Discrete_Random;
+with Ada.Numerics.Float_Random;
 with Vision.Display;
 
 package body Vision.Engine is
@@ -25,15 +26,19 @@ package body Vision.Engine is
      (Directions.Enum);
 
    Generator : Random_Directions.Generator;
+   Float_Generator : Ada.Numerics.Float_Random.Generator;
    Current_Direction : Directions.Enum;
+   Current_Size : Detail_Size;
+
+   procedure Renew_Values;
 
 
 
    procedure Start is
    begin
       Random_Directions.Reset (Generator);
-      Current_Direction := Random_Directions.Random (Generator);
-      Display.Update (24, Current_Direction);
+      Ada.Numerics.Float_Random.Reset (Float_Generator);
+      Renew_Values;
    end Start;
 
 
@@ -43,11 +48,22 @@ package body Vision.Engine is
    procedure User_Input (Direction : in Directions.Enum) is
    begin
       Ada.Text_IO.Put_Line
-        (Directions.Enum'Image (Current_Direction)
+        (Detail_Size'Image (Current_Size)
+         & Ada.Characters.Latin_1.HT
+         & Directions.Enum'Image (Current_Direction)
          & Ada.Characters.Latin_1.HT
          & Directions.Enum'Image (Direction));
-      Current_Direction := Random_Directions.Random (Generator);
-      Display.Update (24, Current_Direction);
+      Renew_Values;
    end User_Input;
+
+
+   procedure Renew_Values is
+   begin
+      Current_Direction := Random_Directions.Random (Generator);
+      Current_Size := Minimum_Size + Detail_Size
+        (Float'Floor (Ada.Numerics.Float_Random.Random (Float_Generator)
+                        * Float (Maximum_Size - Minimum_Size + 1)));
+      Display.Update (Current_Size, Current_Direction);
+   end Renew_Values;
 
 end Vision.Engine;
