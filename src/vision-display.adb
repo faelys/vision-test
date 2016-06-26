@@ -62,6 +62,7 @@ package body Vision.Display is
 
 
    task X_Event_Loop is
+      entry Start;
       entry Ending;
    end X_Event_Loop;
 
@@ -229,6 +230,7 @@ package body Vision.Display is
       Unused_Int : Interfaces.C.int;
       pragma Unreferenced (Unused_Int);
    begin
+      accept Start;
 
       Create_Graphic_Context :
       declare
@@ -327,7 +329,10 @@ package body Vision.Display is
 
 
 
-   procedure Start is null;
+   procedure Start is
+   begin
+      X_Event_Loop.Start;
+   end Start;
 
 
    procedure Stop is
