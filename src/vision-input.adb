@@ -25,6 +25,7 @@ with Vision.Engine;
 package body Vision.Input is
 
    WS : AWS.Server.HTTP;
+   Count : Positive := 1;
 
    function Handler (Request : in AWS.Status.Data) return AWS.Response.Data;
 
@@ -53,6 +54,7 @@ package body Vision.Input is
             end;
 
             Engine.User_Input (D);
+            Count := Count + 1;
          end;
          return AWS.Response.URL (Location => "/");
       else
@@ -81,7 +83,8 @@ package body Vision.Input is
         & "input { font-size: 1000%; text-align: center; "
            & "width: 1.2em; height: 1.2em }"
         & "</style></head><body>"
-        & "<h1>Vision Test</h1><table><tr><td></td>"
+        & "<h1>Vision Test</h1><p>Test"
+        & Positive'Image (Count) & "</p><table><tr><td></td>"
         & "<td><form method=""POST"" action=""/entry"">"
            & "<input name=""direction"" value=""north"" type=""hidden"">"
            & "<input type=""submit"" value=""m"">"
