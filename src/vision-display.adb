@@ -47,8 +47,10 @@ package body Vision.Display is
         (New_Gap_Size : in Interfaces.Unsigned_16;
          New_Direction : in Directions.Enum);
 
-      procedure Redraw;
+      entry Redraw;
    private
+      Initialized : Boolean := False;
+      Sized : Boolean := False;
       Connection : XCB.Connection_Access_Type;
       Window : XCB.Window_Id_Type;
       Context : XCB.Gcontext_Id_Type;
@@ -138,6 +140,7 @@ package body Vision.Display is
          Context := GC;
          Color_Black := Black;
          Color_White := White;
+         Initialized := True;
       end Initialize;
 
 
@@ -145,6 +148,7 @@ package body Vision.Display is
       begin
          Whole_Window (0).Width := Width;
          Whole_Window (0).Height := Height;
+         Sized := True;
       end Update_Size;
 
 
@@ -157,7 +161,7 @@ package body Vision.Display is
       end Update;
 
 
-      procedure Redraw is
+      entry Redraw when Initialized and Sized is
          use type Interfaces.Unsigned_16;
 
          Top_Left : constant XCB.Point_Type
