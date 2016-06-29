@@ -17,7 +17,8 @@
 package Vision is
 
    package Directions is
-      type Enum is (North, South, East, West);
+      type Extended is (Unknown, North, South, East, West);
+      subtype Enum is Extended range North .. West;
    end Directions;
 
    type Detail_Size is range 1 .. 15_000;
