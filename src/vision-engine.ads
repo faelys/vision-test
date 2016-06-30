@@ -19,6 +19,6 @@ package Vision.Engine is
    procedure Start;
    procedure Stop;
 
-   procedure User_Input (Direction : in Directions.Enum);
+   procedure User_Input (Direction : in Directions.Extended);
 
 end Vision.Engine;

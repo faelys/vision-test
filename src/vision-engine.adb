@@ -45,14 +45,14 @@ package body Vision.Engine is
    procedure Stop is null;
 
 
-   procedure User_Input (Direction : in Directions.Enum) is
+   procedure User_Input (Direction : in Directions.Extended) is
    begin
       Ada.Text_IO.Put_Line
         (Detail_Size'Image (Current_Size)
          & Ada.Characters.Latin_1.HT
          & Directions.Enum'Image (Current_Direction)
          & Ada.Characters.Latin_1.HT
-         & Directions.Enum'Image (Direction));
+         & Directions.Extended'Image (Direction));
       Renew_Values;
    end User_Input;
 
