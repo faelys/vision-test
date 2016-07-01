@@ -44,10 +44,10 @@ package body Vision.Input is
             P : constant AWS.Parameters.List
               := AWS.Status.Parameters (Request);
             Img : constant String := AWS.Parameters.Get (P, "direction");
-            D : Directions.Enum;
+            D : Directions.Extended;
          begin
             begin
-               D := Directions.Enum'Value (Img);
+               D := Directions.Extended'Value (Img);
             exception
                when Constraint_Error =>
                   return Invalid_Input;
@@ -83,7 +83,7 @@ package body Vision.Input is
         & "input { font-size: 1000%; text-align: center; "
            & "width: 1.2em; height: 1.2em }"
         & "</style></head><body>"
-        & "<h1>Vision Test</h1><p>Test"
+        & "<h1>Vision Test</h1><p>Display "
         & Positive'Image (Count) & "</p><table><tr><td></td>"
         & "<td><form method=""POST"" action=""/entry"">"
            & "<input name=""direction"" value=""north"" type=""hidden"">"
@@ -92,7 +92,11 @@ package body Vision.Input is
         & "<td><form method=""POST"" action=""/entry"">"
            & "<input name=""direction"" value=""west"" type=""hidden"">"
            & "<input type=""submit"" value=""E"">"
-           & "</form></td><td></td>"
+           & "</form></td>"
+        & "<td><form method=""POST"" action=""/entry"">"
+           & "<input name=""direction"" value=""unknown"" type=""hidden"">"
+           & "<input type=""submit"" value=""X"">"
+           & "</form></td>"
         & "<td><form method=""POST"" action=""/entry"">"
            & "<input name=""direction"" value=""east"" type=""hidden"">"
            & "<input type=""submit"" value=""&#8707"">"
