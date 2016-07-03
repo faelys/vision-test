@@ -25,6 +25,9 @@ package body Vision.Engine is
    package Random_Directions is new Ada.Numerics.Discrete_Random
      (Directions.Enum);
 
+   Image : constant array (Boolean) of Character
+     := (True => '1', False => '0');
+
    Generator : Random_Directions.Generator;
    Float_Generator : Ada.Numerics.Float_Random.Generator;
    Current_Direction : Directions.Enum;
@@ -46,13 +49,16 @@ package body Vision.Engine is
 
 
    procedure User_Input (Direction : in Directions.Extended) is
+      use type Directions.Extended;
    begin
       Ada.Text_IO.Put_Line
         (Detail_Size'Image (Current_Size)
          & Ada.Characters.Latin_1.HT
          & Directions.Enum'Image (Current_Direction)
          & Ada.Characters.Latin_1.HT
-         & Directions.Extended'Image (Direction));
+         & Directions.Extended'Image (Direction)
+         & Ada.Characters.Latin_1.HT
+         & Image (Current_Direction = Direction));
       Renew_Values;
    end User_Input;
 
