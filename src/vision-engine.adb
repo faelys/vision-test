@@ -67,8 +67,9 @@ package body Vision.Engine is
    begin
       Current_Direction := Random_Directions.Random (Generator);
       Current_Size := Minimum_Size + Detail_Size
-        (Float'Floor (Ada.Numerics.Float_Random.Random (Float_Generator)
-                        * Float (Maximum_Size - Minimum_Size + 1)));
+        (1.0 + Float'Floor (Ada.Numerics.Float_Random.Random (Float_Generator)
+                        * Float (Maximum_Size - Minimum_Size + 1)))
+        - 1;
       Display.Update (Current_Size, Current_Direction);
    end Renew_Values;
 
